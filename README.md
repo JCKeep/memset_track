@@ -1,5 +1,5 @@
 # memset_track
-tracking the memset_s function for debugging some simple memory faulty. This is just a simple way to tracking memory problom whthout ASAN.
+tracking the memset_s function for debugging some simple memory faulty. This is just a simple way to tracking memory problom without ASAN.
 
 ## Usage
 
@@ -34,14 +34,14 @@ tracking the memset_s function for debugging some simple memory faulty. This is 
 ## Example
 
 ```shell
-$ make && ./target/main
-ERROR: memset_s hit the track memory at RET_IP = 0x57943f8f266c
-./target/main(+0x1450)[0x57943f8f2450]
-./target/main(+0x15d9)[0x57943f8f25d9]
-./target/main(+0x166c)[0x57943f8f266c]
-/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7263ed629d90]
-/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7263ed629e40]
-./target/main(+0x1185)[0x57943f8f2185]
+$ make example && ./target/example/example1
+ERROR: memset_s hit the track memory at RET_IP = 0x63a64f2f866c
+./target/example/example1(+0x1450)[0x63a64f2f8450]
+./target/example/example1(+0x15d9)[0x63a64f2f85d9]
+./target/example/example1(+0x166c)[0x63a64f2f866c]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x790bf6229d90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x790bf6229e40]
+./target/example/example1(+0x1185)[0x63a64f2f8185]
 buf: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe 
-tracked_mem: fe fe 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+tracked_mem: fe fe 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 ```

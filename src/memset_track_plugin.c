@@ -127,8 +127,7 @@ __visible int plugin_init(struct plugin_name_args *plugin_info,
         * versions of the plugin this new pass was inserted before the
         * "tree_profile" pass, which is currently called "profile".
         */
-        PASS_INFO(memset_track, "optimized", 1,
-                        PASS_POS_INSERT_BEFORE);
+        PASS_INFO(memset_track, "optimized", 1, PASS_POS_INSERT_BEFORE);
 
         /*
         * Hook into the Pass Manager to register new gcc passes.
