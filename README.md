@@ -1,5 +1,7 @@
 # memset_track
-tracking the memset_s function for debugging some simple memory faulty. This is just a simple way to tracking memory problom without ASAN.
+
+For debugging some simple memory problom cause by `memset` or `memcpy`. 
+**This is just a simple way to tracking memory problom without ASAN**.
 
 ## Usage
 
@@ -7,7 +9,7 @@ tracking the memset_s function for debugging some simple memory faulty. This is 
    ```c
    uint8_t tracked_mem[16];
 
-   memset_track_register((uintptr_t)&tracked_mem, sizeof(tracked_mem));
+   memset_track_register("test1", (uintptr_t)&tracked_mem, sizeof(tracked_mem));
    ```
    
    If you did not want to track it anymore, you could unregister it.
@@ -35,13 +37,13 @@ tracking the memset_s function for debugging some simple memory faulty. This is 
 
 ```shell
 $ make example && ./target/example/example1
-ERROR: memset_s hit the track memory at RET_IP = 0x63a64f2f866c
-./target/example/example1(+0x1450)[0x63a64f2f8450]
-./target/example/example1(+0x15d9)[0x63a64f2f85d9]
-./target/example/example1(+0x166c)[0x63a64f2f866c]
-/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x790bf6229d90]
-/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x790bf6229e40]
-./target/example/example1(+0x1185)[0x63a64f2f8185]
-buf: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe 
+ERROR: memset_s overlaps the memory [tracked_mem] at IP = 0x5a234d6706b1
+./target/example/example1(print_stack_trace+0x49)[0x5a234d67047d]
+./target/example/example1(memset_track_s+0xd6)[0x5a234d670614]
+./target/example/example1(main+0x51)[0x5a234d6706b1]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x74d230229d90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x74d230229e40]
+./target/example/example1(_start+0x25)[0x5a234d670185]
+buf:         fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe 
 tracked_mem: fe fe 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 ```

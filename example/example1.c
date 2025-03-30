@@ -6,10 +6,10 @@
 #include <stdbool.h>
 #include <execinfo.h>
 #include <list.h>
+#include <array_size.h>
+#include <instruction_pointer.h>
 
-#define array_size(arr) (sizeof(arr) / sizeof(arr[0]))
-#define _RET_IP_        (unsigned long)__builtin_return_address(0)
-#define _THIS_IP_       ({ __label__ __here; __here: (unsigned long)&&__here; })
+#define STRINGLIFY(x) #x
 
 #define min(x, y) ({              \
         typeof(x) __x = x;        \
@@ -20,16 +20,18 @@ static LIST_HEAD(memset_track_list);
 
 struct track_mem {
         struct list_head list_head;
+        const char *name;
         uintptr_t addr;
         unsigned long size;
 };
 
-void memset_track_register(uintptr_t addr, unsigned long size)
+void memset_track_register(const char *name, uintptr_t addr, unsigned long size)
 {
         struct track_mem *track = malloc(sizeof(struct track_mem));
         if (!track)
                 return;
 
+        track->name = name;
         track->addr = addr;
         track->size = size;
         list_add(&track->list_head, &memset_track_list);
@@ -50,8 +52,8 @@ void memset_track_unregister(uintptr_t addr)
 
 void print_stack_trace()
 {
-    void *buffer[10];
-    int size = backtrace(buffer, 10);
+    void *buffer[30] = { NULL };
+    int size = backtrace(buffer, ARRAY_SIZE(buffer));
     
     backtrace_symbols_fd(buffer, size, STDOUT_FILENO);
 }
@@ -75,7 +77,8 @@ void *memset_track_s(void *dest, int size, int c, unsigned long count)
 
         list_for_each_entry_safe(pos, tmp, &memset_track_list, list_head) {
                 if (is_overlapping(addr, min(size, count), pos->addr, pos->size)) {
-                        fprintf(stderr, "ERROR: memset_s hit the track memory at RET_IP = 0x%lx\n", _RET_IP_);
+                        fprintf(stderr, "ERROR: memset_s overlaps the memory [%s] at IP = 0x%lx\n",
+                                pos->name, _RET_IP_);
                         print_stack_trace();
                 }
         }
@@ -88,13 +91,13 @@ int main()
         uint8_t buf[16];
         uint8_t tracked_mem[16];
 
-        memset_track_register((uintptr_t)&tracked_mem, sizeof(tracked_mem));
+        memset_track_register(STRINGLIFY(tracked_mem), (uintptr_t)&tracked_mem, sizeof(tracked_mem));
 
         memset_s(buf, sizeof(buf) + 2, 0x00, sizeof(buf) + 2);
 
-        printf("buf: ");
+        printf("buf:         ");
 
-        for (int i = 0; i < array_size(buf); i++) {
+        for (int i = 0; i < ARRAY_SIZE(buf); i++) {
                 printf("%02x ", buf[i]);
         }
 
@@ -102,7 +105,7 @@ int main()
 
         printf("tracked_mem: ");
 
-        for (int i = 0; i < array_size(tracked_mem); i++) {
+        for (int i = 0; i < ARRAY_SIZE(tracked_mem); i++) {
                 printf("%02x ", tracked_mem[i]);
         }
 
