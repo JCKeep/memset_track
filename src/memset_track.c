@@ -11,18 +11,11 @@
 #include <execinfo.h>
 #include <list.h>
 #include <min_max.h>
+#include <memset_track.h>
 #include <array_size.h>
 #include <instruction_pointer.h>
 
-
 static LIST_HEAD(memset_track_list);
-
-struct track_mem {
-        struct list_head list_head;
-        const char *name;
-        uintptr_t addr;
-        unsigned long size;
-};
 
 void memset_track_register(const char *name, uintptr_t addr, unsigned long size)
 {
@@ -49,7 +42,7 @@ void memset_track_unregister(uintptr_t addr)
         }
 }
 
-void print_stack_trace()
+static void print_stack_trace()
 {
     void *buffer[30] = { NULL };
     int size = backtrace(buffer, ARRAY_SIZE(buffer));
@@ -82,5 +75,5 @@ void *memset_track_s(void *dest, int size, int c, unsigned long count)
                 }
         }
 
-        return memset_s(dest, size, 0xfe, count);
+        return memset_s(dest, size, c, count);
 }
