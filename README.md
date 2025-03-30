@@ -36,7 +36,24 @@ For debugging some simple memory problom cause by `memset` or `memcpy`.
 ## Example
 
 ```shell
-$ make example && ./target/example/example1
+shell$ make example
+gcc -O0 -o target/example/example1 example/example1.c \
+        -fplugin=target/memset_track_plugin.so \
+        -fplugin-arg-memset_track_plugin-verbose \
+        -I./include \
+        -rdynamic
+===> [MEMSET_TRACKING] start, rewriting the AST node...
+Before: 
+# .MEM_14 = VDEF <.MEM_13>
+memset_s (&buf, 18, 0, 18);
+
+After: 
+# .MEM_14 = VDEF <.MEM_13>
+memset_track_s (&buf, 18, 0, 18);
+<=== [MEMSET_TRACKING] finish.
+redirect memset_s to memset_track_s in main()
+
+shell$ ./target/example/example1
 ERROR: memset_s overlaps the memory [tracked_mem] at IP = 0x5a234d6706b1
 ./target/example/example1(print_stack_trace+0x49)[0x5a234d67047d]
 ./target/example/example1(memset_track_s+0xd6)[0x5a234d670614]

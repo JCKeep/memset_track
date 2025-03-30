@@ -79,16 +79,26 @@ static unsigned int memset_track_execute(void)
                         if (!is_gimple_call(stmt))
                                 continue;
 
-                        if (verbose)
-                                debug_gimple_stmt(stmt);
-
                         if (!is_memset_s(stmt))
                                 continue;
 
                         if (!strcmp(current_function, memset_track_s_function))
                                 continue;
 
+                        if (verbose) {
+                                fprintf(stderr, "===> [MEMSET_TRACKING] start, "
+                                        "rewriting the AST node...\n"
+                                        "Before: \n");
+                                debug_gimple_stmt(stmt);
+                        }
+
                         gimple_call_set_fndecl(stmt, memset_track_decl);
+
+                        if (verbose) {
+                                fprintf(stderr, "\nAfter: \n");
+                                debug_gimple_stmt(stmt); 
+                                fprintf(stderr, "<=== [MEMSET_TRACKING] finish.\n"); 
+                        }
 
                         fprintf(stderr, "redirect memset_s to memset_track_s in %s()\n", current_function);
                 }
