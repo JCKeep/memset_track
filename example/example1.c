@@ -10,15 +10,11 @@
 #include <stdbool.h>
 #include <execinfo.h>
 #include <list.h>
+#include <min_max.h>
 #include <array_size.h>
 #include <instruction_pointer.h>
 
 #define STRINGLIFY(x) #x
-
-#define min(x, y) ({              \
-        typeof(x) __x = x;        \
-        typeof(y) __y = y;        \
-        __x > __y ? __x : __y; }) \
 
 static LIST_HEAD(memset_track_list);
 
