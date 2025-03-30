@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright 2011-2017 by Guangbo Cui <2407018371@qq.com>
+ */
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
